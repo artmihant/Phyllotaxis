@@ -1,7 +1,15 @@
-# Vue 3 + Vite
+# Филлотаксис подсолнуха
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Цель данной демонстрации - показать формирование [филлотаксиса]( https://en.wikipedia.org/wiki/Phyllotaxis) зерен в цветке подсолнуха.
 
-## Recommended IDE Setup
+Данная демонстрация показывает удивительное свойство конфигураций спиралей, в которые собираются зерна во время роста - а именно, если зерна распределены равномерно по цветку, отношение индексов (количеств) спиралей, формирующихся из семян, будет близким к константе Фидия = 1.618... , прославленной пропорции золотого сечения.
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+Более подробное обьяснение этого явления можно видеть здесь: [Удивительные спирали филлотаксиса](https://youtu.be/auUNVPMypf0)
+
+## Установка демонстрации
+Проект собран с помощью vite + vue
+
+`npm run dev` - запуск демонстрации в режиме разработки
+
+`npm run build` - сборка демонстрации
+
