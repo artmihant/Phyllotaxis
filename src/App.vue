@@ -15,20 +15,18 @@
 
 
     </div>
-    <canvas class="canvas" ref="canvas" :width="r_width" :height="r_height"></canvas>
+    <canvas class="canvas" ref="canvas" :width="r_size*2" :height="r_size*2"></canvas>
 </template>
 
 <script setup>
 import {onMounted, ref, watch} from "vue";
 
-let r_width = ref(500)
-let r_height = ref(500)
-
+let r_size = ref(180)
 let r_angle_step = ref(137.5)
+let r_count = ref(1200)
+let r_length_step = ref(Math.floor(r_size.value/(Math.sqrt(r_count.value))))
+let r_radius = ref(Math.floor(r_length_step.value/2))
 
-let r_length_step = ref(6)
-let r_radius = ref(3)
-let r_count = ref(1500)
 let r_N = ref(0)
 let r_P = ref(1)
 
@@ -42,15 +40,15 @@ let draw = () => {
     const ctx = canvas.value.getContext('2d');
     let length_step = Number(r_length_step.value)
     let angle_step = Number(r_angle_step.value)
-    let width = Number(r_width.value)
-    let height = Number(r_height.value)
+    let size = Number(r_size.value)
+
     let radius = Number(r_radius.value)
     let count = Number(r_count.value)
 
     let begin_color = [165,255,0]
     let end_color = [255,165,0]
 
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, size*2, size*2);
 
     if (view_line.value){
 
@@ -59,8 +57,8 @@ let draw = () => {
         ctx.beginPath();
         for(let i=0; i<count; i++){
             let point = [
-                width/2 + Math.ceil(length_step*Math.sqrt(i)*Math.cos(Math.PI*angle/180)),
-                height/2 + Math.ceil(length_step*Math.sqrt(i)*Math.sin(Math.PI*angle/180))
+                size + Math.ceil(length_step*Math.sqrt(i)*Math.cos(Math.PI*angle/180)),
+                size + Math.ceil(length_step*Math.sqrt(i)*Math.sin(Math.PI*angle/180))
             ]
             let color = [
                 Math.ceil((1-i/count)*begin_color[0] + i/count*end_color[0]),
@@ -73,10 +71,7 @@ let draw = () => {
                 ctx.strokeStyle = "white"
             }
 
-            ctx.lineTo(...[
-                width/2 + Math.ceil(length_step*Math.sqrt(i)*Math.cos(Math.PI*angle/180)),
-                height/2 + Math.ceil(length_step*Math.sqrt(i)*Math.sin(Math.PI*angle/180))
-            ])
+            ctx.lineTo(...point)
             angle += angle_step
         }
         ctx.stroke();
@@ -87,8 +82,8 @@ let draw = () => {
 
         for(let i=0; i<count; i++){
             let point = [
-                width/2 + Math.ceil(length_step*Math.sqrt(i)*Math.cos(Math.PI*angle/180)),
-                height/2 + Math.ceil(length_step*Math.sqrt(i)*Math.sin(Math.PI*angle/180))
+                size + Math.ceil(length_step*Math.sqrt(i)*Math.cos(Math.PI*angle/180)),
+                size + Math.ceil(length_step*Math.sqrt(i)*Math.sin(Math.PI*angle/180))
             ]
             let color = [
                 Math.ceil((1-i/count)*begin_color[0] + i/count*end_color[0]),
@@ -114,7 +109,7 @@ watch(r_angle_step, draw)
 watch(r_radius, draw)
 
 watch(r_count, (count)=>{
-    r_length_step.value = Math.floor(r_width.value/(2*Math.sqrt(count)))-1
+    r_length_step.value = Math.floor(r_size.value/(Math.sqrt(count)))
     r_radius.value = Math.floor(r_length_step.value/2)
     draw()
 })
@@ -125,7 +120,7 @@ watch(r_count, (count)=>{
 .control{
     top:0;
     left:0;
-    width:100vw;
+    width: 100vw;
     position: absolute;
 }
 .num{
