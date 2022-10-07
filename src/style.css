@@ -1,0 +1,32 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color: #213547;
+  background-color: #ffffff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+}
+
+#app {
+  width:100vw;
+  height: 100vh;
+  margin: 0 auto;
+  text-align: center;
+  display: grid;
+  place-items: center;
+  background: url("/sunflower.png") no-repeat center;
+}
