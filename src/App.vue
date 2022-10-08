@@ -1,11 +1,12 @@
 
 <template>
     <div class="control">
-        <p><input type="range"  style="width:90%" min="0" max="180" step="0.01" v-model="r_angle_step"></p>
+        <p><input type="range" style="width:90%" min="0" max="180" step="0.01" v-model="r_angle_step"></p>
+        <p><input type="range" style="width:90%" min="1" max="2000" step="1" v-model="r_count"></p>
         <p>
             Угол: <input  class="num" type="number" min="0" max="180" step="0.1" v-model="r_angle_step">
             Число зерен: <input type="number"   class="num" @change="draw" v-model="r_count">
-            Радиус зерна: <input type="number"  class="num" @change="draw" v-model="r_radius">
+<!--            Размер зерна: <input type="number"  class="num" @change="draw" v-model="r_radius">-->
         </p>
         <p>
             <input type="checkbox" @change="draw" v-model="view_points"> Зерна
@@ -44,13 +45,13 @@ let draw = () => {
     let radius = Number(r_radius.value)
     let count = Number(r_count.value)
 
-    let begin_color = [165,255,0]
-    let end_color = [255,165,0]
+    let begin_color = [255,165,0]
+    let end_color = [165,255,0]
 
     let points = []
 
     for(let i=0; i<count; i++){
-        let r = length_step*Math.sqrt(i)
+        let r = length_step*Math.sqrt(count-i-1)
         let a = Math.PI*angle_step*i/180
         points.push([
             size + Math.round(r*Math.cos(a)),
