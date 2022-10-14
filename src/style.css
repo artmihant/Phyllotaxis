@@ -32,12 +32,4 @@ body {
   background: url("./assets/sunflower.png") no-repeat center;
 }
 
-.control{
-  top:0;
-  left:0;
-  width: 100vw;
-  position: absolute;
-}
-.num{
-  width: 50px !important;
-}
+

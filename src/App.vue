@@ -1,37 +1,49 @@
 
 <template>
-    <div class="control">
-        <p><input type="range" style="width:90%" min="0" max="180" step="0.01" v-model="r_angle_step"></p>
-        <p><input type="range" style="width:90%" min="1" max="2000" step="1" v-model="r_count"></p>
+    <div class="top-control">
+        <p><input type="range" style="width:90%" min="0" max="180" step="0.01" v-model="num_angle"></p>
+        <p><input type="range" style="width:90%" min="1" max="2000" step="1" v-model="num_count"></p>
         <p>
-            Угол: <input  class="num" type="number" min="0" max="180" step="0.1" v-model="r_angle_step">
-            Число зерен: <input type="number"   class="num" @change="draw" v-model="r_count">
-<!--            Размер зерна: <input type="number"  class="num" @change="draw" v-model="r_radius">-->
+            Угол: <input class="num" type="number"  min="0" max="180" step="0.01" v-model="num_angle"> |
+            Зерен: <input class="num" type="number" v-model="count">
         </p>
-        <p>
-            <input type="checkbox" @change="draw" v-model="view_points"> Зерна
-            <input type="checkbox" @change="draw" v-model="view_line"> Генетическая спираль
-        </p>
-        <p>Cпираль № <input class="num" type="number" @change="draw" v-model="r_P"> из <input class="num" type="number" @change="draw" v-model="r_N"></p>
-
     </div>
     <canvas class="canvas" ref="canvas" :width="size*2" :height="size*2"></canvas>
+    <div class="bottom-control">
+
+        <p >
+            {{num_angle}}/360°
+            <template v-for="spiral in spirals" >
+                ≈<span @click="rank=rank===spiral[1]?null:spiral[1]" class="spiral" :class="{active:rank===spiral[1]}" >
+                    {{spiral[0]}}/{{spiral[1]}}
+                </span>
+            </template>
+        </p>
+        <p>
+            <span class="spiral" :class="{active:view_points}" @click="view_points = !view_points" >Зерна</span> |
+            <span class="spiral" :class="{active:view_line}" @click="view_line = !view_line" >Спираль</span> |
+            Ранг: <input class="num"  type="number" @change="draw" v-model="rank">
+        </p>
+    </div>
 </template>
 
 <script setup>
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
+import {parast} from "./cfd.js";
 
 let size = 180
+let angle_grad = 137.5
+let count = 1200
 
-let r_angle_step = ref(137.5)
-let r_count = ref(1200)
-let r_length_step = ref(Math.floor(size/(Math.sqrt(r_count.value))))
-let r_radius = ref(Math.floor(r_length_step.value/2))
+let num_count = ref(count)
+let num_angle = ref(angle_grad)
 
-let r_N = ref(0)
-let r_P = ref(1)
+let length_step = computed(() => Math.floor(size/(Math.sqrt(num_count.value))))
+let radius = computed(() => Math.floor(size/(2*Math.sqrt(num_count.value))))
+let spirals = computed(() => parast(Number(num_angle.value)/360))
 
-let view_line = ref(false)
+let rank = ref(null)
+let view_line = ref(true)
 let view_points = ref(true)
 
 /** @type {{value:HTMLCanvasElement}} */
@@ -39,11 +51,8 @@ let canvas = ref()
 
 let draw = () => {
     const ctx = canvas.value.getContext('2d');
-    let length_step = Number(r_length_step.value)
-    let angle_step = Number(r_angle_step.value)
-
-    let radius = Number(r_radius.value)
-    let count = Number(r_count.value)
+    let angle = num_angle.value
+    let count = num_count.value
 
     let begin_color = [255,165,0]
     let end_color = [165,255,0]
@@ -51,8 +60,8 @@ let draw = () => {
     let points = []
 
     for(let i=0; i<count; i++){
-        let r = length_step*Math.sqrt(count-i-1)
-        let a = Math.PI*angle_step*i/180
+        let r = length_step.value*Math.sqrt(count-i-1)
+        let a = Math.PI*angle*i/180
         points.push([
             size + Math.round(r*Math.cos(a)),
             size + Math.round(r*Math.sin(a))
@@ -61,10 +70,10 @@ let draw = () => {
 
     ctx.clearRect(0, 0, size*2, size*2);
 
-    if (view_line.value){
+    if (rank.value && view_line.value){
         ctx.strokeStyle = "rgb(255,165,0)";
         ctx.beginPath();
-        points.forEach(point => ctx.lineTo(...point))
+        points.forEach((point,i) => {if (i%rank.value === 0) ctx.lineTo(...point)})
         ctx.stroke();
     }
 
@@ -77,27 +86,57 @@ let draw = () => {
                 Math.ceil((1-i/count)*begin_color[2] + i/count*end_color[2]),
             ]
             ctx.fillStyle = "rgb("+color[0]+","+color[1]+","+color[2]+")";
-            if (i%r_N.value === (r_P.value-1)%r_N.value) {
+            if (i%rank.value === 0) {
                 ctx.fillStyle = "white"
             }
             ctx.beginPath();
-            ctx.arc(points[i][0],points[i][1], radius, 0, 2 * Math.PI, false);
+            ctx.arc(points[i][0],points[i][1], radius.value, 0, 2 * Math.PI, false);
             ctx.fill();
         }
     }
-
 }
 
-onMounted(draw)
 
-watch(r_angle_step, draw)
-watch(r_radius, draw)
-
-watch(r_count, (count)=>{
-    r_length_step.value = Math.floor(size/(Math.sqrt(count)))
-    r_radius.value = Math.floor(r_length_step.value/2)
-    draw()
+onMounted(()=>{
+    requestAnimationFrame(function step() {
+        draw()
+        requestAnimationFrame(step)
+    })
 })
+
 
 </script>
 
+<style>
+.top-control{
+    top:0;
+    left:0;
+    width: 100vw;
+    position: absolute;
+}
+.bottom-control{
+    bottom:0;
+    left:0;
+    width: 100vw;
+    position: absolute;
+}
+
+.spiral{
+    border: 1px #472f28 solid;
+    border-radius: 5px;
+    margin-left:3px;
+    margin-top:3px;
+    cursor:pointer;
+    background-color: #ffe445;
+    color: #472f28;
+    padding: 3px;
+}
+.spiral.active {
+    color: #ffe445;
+    background-color: #472f28;
+}
+
+.num{
+    width: 78px !important;
+}
+</style>
