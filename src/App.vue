@@ -5,7 +5,7 @@
         <p><input type="range" style="width:90%" min="1" max="2000" step="1" v-model="num_count"></p>
         <p>
             Угол: <input class="num" type="number"  min="0" max="180" step="0.01" v-model="num_angle"> |
-            Зерен: <input class="num" type="number" v-model="count">
+            Зерен: <input class="num" type="number" v-model="num_count">
         </p>
     </div>
     <canvas class="canvas" ref="canvas" :width="size*2" :height="size*2"></canvas>
@@ -137,6 +137,6 @@ onMounted(()=>{
 }
 
 .num{
-    width: 78px !important;
+    width: 70px !important;
 }
 </style>
